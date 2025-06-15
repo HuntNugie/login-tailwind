@@ -25,6 +25,11 @@ Route::post("/login",function(Request $request){
     return back()->withErrors(["gagal" => "gagal login"]);
 })->name("login.post");
 Route::get("/register",fn()=>view("auth.register"))->name("register");
+Route::post("/logout",function(){
+    Auth::logout();
+    session()->invalidate();
+    return redirect()->route("login");
+})->name("logout");
 // Route::post('users/{id}', function ($id) {
 
 // });
