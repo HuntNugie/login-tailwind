@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\VerifEmailController;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -9,48 +12,31 @@ use Illuminate\Support\Facades\Route;
 Route::get("/",fn()=> redirect()->route("home"));
 Route::get('/home', function () {
     return view('welcome');
-})->name("home")->middleware('auth');
-Route::get("/login",function(){
-    if(Auth::check()){
-        return redirect()->intended('home');
-    }
-    return view('auth.login');
-})->name("login");
-Route::post("/login",function(Request $request){
-    $credential = $request->validate([
-        "email" => "required|email",
-        "password" => "required"
-    ]);
-    if(Auth::attempt($credential)){
-        $request->session()->regenerate();
-        return redirect()->intended('home');
-    }
-    return back()->withErrors(["gagal" => "gagal login"]);
-})->name("login.post");
-Route::get("/register",fn()=>view("auth.register"))->name("register");
-Route::post("/register",function(Request $request){
-    $credential = $request->validate([
-        "name" => "required | string",
-        "email" => "required | email | unique:users",
-        "password" => "required"
-    ]);
+})->name("home")->middleware(['auth','terverifikasi']);
 
-    if($request->password !== $request->confirm_password){
-        return back()->withErrors(["gagal" => "Confirmasi password tidak sama dengan password"]);
-    }
-   $user =  User::create([
-        "name" => $request->name,
-        "email" => $request->email,
-        "password" => Hash::make($request->password)
-    ]);
-    Auth::login($user);
+// login
+Route::get("/login",[LoginController::class,"index"])->name("login");
+Route::post("/login",[LoginController::class,"push"])->name("login.post");
 
-    return redirect()->intended('home');
-})->name("register.store");
+// register
+Route::prefix("register")->group(function(){
+    Route::get("/verifikasi-email",[VerifEmailController::class,"showForm"])->name("vermel");
+    Route::post("/verifikasi-email",[VerifEmailController::class,"verifikasi"])->name("vermel.verifikasi");
+
+    Route::get("/kode-otp",[VerifEmailController::class,"showOtp"])->name("vermel.otp")->middleware("verif-email");
+    Route::post("/kode-otp/{id}",[VerifEmailController::class,"cekOtp"])->name("vermel.cekOtp");
+    Route::get("/isi",[RegisterController::class,"index"])->name("register")->middleware("verif-email");
+    Route::post("/register/{user:email}",[RegisterController::class,"store"])->name("register.store");
+});
+// verifikasi email untuk
+
 Route::post("/logout",function(){
     Auth::logout();
     session()->invalidate();
     return redirect()->route("login");
 })->name("logout");
 
-
+Route::get("/pyus",function(){
+    User::truncate();
+    return "berhasil";
+});
