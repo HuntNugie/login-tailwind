@@ -19,7 +19,8 @@ class LoginController extends Controller
         "email" => "required|email",
         "password" => "required"
     ]);
-    if(Auth::attempt($credential)){
+    $remember = $request->has('remember');
+    if(Auth::attempt($credential,$remember)){
         $request->session()->regenerate();
         return redirect()->intended('home');
     }

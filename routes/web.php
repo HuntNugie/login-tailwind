@@ -36,7 +36,7 @@ Route::post("/logout",function(){
     return redirect()->route("login");
 })->name("logout");
 
-Route::get("/pyus",function(){
-    User::truncate();
-    return "berhasil";
-});
+// Route::get("/pyus",function(){
+//     User::truncate();
+//     return "berhasil";
+// });

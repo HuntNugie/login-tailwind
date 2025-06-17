@@ -18,7 +18,7 @@
 
       <div class="flex items-center justify-between">
         <label class="flex items-center space-x-2 text-sm">
-          <input type="checkbox" class="form-checkbox text-blue-500" />
+          <input type="checkbox" name="remember" class="form-checkbox text-blue-500" />
           <span>Remember me</span>
         </label>
         <a href="#" class="text-sm text-blue-600 hover:underline">Forgot password?</a>
